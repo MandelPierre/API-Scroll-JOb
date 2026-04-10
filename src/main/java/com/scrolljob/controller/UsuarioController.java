@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/usuarios")
-@CrossOrigin // permite conectar com frontend
+@CrossOrigin(origins = "*")// permite conectar com frontend
 public class UsuarioController {
 
     private final UsuarioService service;
