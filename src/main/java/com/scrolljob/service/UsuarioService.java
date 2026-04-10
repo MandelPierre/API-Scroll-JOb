@@ -15,7 +15,7 @@ public class UsuarioService {
     private Long contadorId = 1L;
 
     public Usuario criar(UsuarioDTO dto) {
-        Usuario usuario = new Usuario(contadorId++, dto.getEmail(), dto.getSenha());
+        Usuario usuario = new Usuario(contadorId++, dto.getEmail(), dto.getPassword());
         lista.add(usuario);
         return usuario;
     }
@@ -34,7 +34,7 @@ public class UsuarioService {
     public Usuario atualizar(Long id, UsuarioDTO dto) {
         Usuario usuario = buscarPorId(id);
         usuario.setEmail(dto.getEmail());
-        usuario.setSenha(dto.getSenha());
+        usuario.setPassword(dto.getPassword());
         return usuario;
     }
 
