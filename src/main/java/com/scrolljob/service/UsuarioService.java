@@ -1,45 +1,55 @@
 package com.scrolljob.service;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.scrolljob.dto.LoginDTO;
 import com.scrolljob.entity.Usuario;
-import com.scrolljob.dto.UsuarioDTO;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UsuarioService {
 
+    private List<Usuario> carregarUsuarios() {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            InputStream arquivo = getClass().getClassLoader()
+                    .getResourceAsStream("teste-banco.json");
 
-    //simulação de banco para teste temporario
-    private List<Usuario> lista = new ArrayList<>();
-    private Long contadorId = 1L;
+            JsonNode root = mapper.readTree(arquivo);
+            JsonNode usuariosNode = root.get("usuarios");
 
-    public Usuario criar(UsuarioDTO dto) {
-        Usuario usuario = new Usuario(contadorId++, dto.getNome(), dto.getEmail());
-        lista.add(usuario);
-        return usuario;
+            List<Usuario> lista = new ArrayList<>();
+            for (JsonNode node : usuariosNode) {
+                Usuario u = new Usuario();
+                u.setId(node.get("id").asLong());
+                u.setEmail(node.get("email").asText());
+                u.setSenha(node.get("senha").asText());
+                lista.add(u);
+            }
+            return lista;
+
+        } catch (Exception e) {
+            throw new RuntimeException("Erro ao ler o arquivo JSON: " + e.getMessage());
+        }
     }
 
-    public List<Usuario> listar() {
-        return lista;
-    }
+    public String login(LoginDTO dto) {
+        List<Usuario> usuarios = carregarUsuarios();
 
-    public Usuario buscarPorId(Long id) {
-        return lista.stream()
-                .filter(u -> u.getId().equals(id))
+        return usuarios.stream()
+                .filter(u -> u.getEmail().equals(dto.getEmail()))
                 .findFirst()
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-    }
-
-    public Usuario atualizar(Long id, UsuarioDTO dto) {
-        Usuario usuario = buscarPorId(id);
-        usuario.setNome(dto.getNome());
-        usuario.setEmail(dto.getEmail());
-        return usuario;
-    }
-
-    public void deletar(Long id) {
-        Usuario usuario = buscarPorId(id);
-        lista.remove(usuario);
+                .map(u -> {
+                    if (u.getSenha().equals(dto.getSenha())) {
+                        return "Login efetuado com sucesso! Bem-vindo, " + u.getEmail();
+                    } else {
+                        return "Senha incorreta.";
+                    }
+                })
+                .orElse("Usuário não encontrado.");
     }
 }
