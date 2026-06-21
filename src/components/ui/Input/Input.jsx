@@ -2,7 +2,7 @@ function Input({ className = "", ...props }) {
   return (
     <input
       {...props}
-      className={`w-full rounded-lg border border-gray-300 px-4 py-2 outline-none focus:border-blue-500 ${className}`}
+      className={`py-1 px-2 bg-white/20 rounded-2xl shadow-[0_4px_30px_rgba(0,0,0,0.1)] backdrop-blur-[5px] border border-white/30 ${className}`}
     />
   );
 }
